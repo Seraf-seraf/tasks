@@ -1,0 +1,11 @@
+package: httpapi
+output: internal/httpapi/openapi.gen.go
+generate:
+  models: true
+  chi-server: true
+  strict-server: true
+  embedded-spec: true
+output-options:
+  skip-prune: true
+  exclude-tags:
+    - Metrics

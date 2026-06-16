@@ -1,0 +1,8 @@
+.idea
+.vscode
+AGENTS.md
+bin/
+coverage.out
+coverage-critical.out
+.env
+config.yaml

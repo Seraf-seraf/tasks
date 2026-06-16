@@ -5,18 +5,43 @@ import (
 	"gopkg.in/yaml.v3"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
+
+type Duration time.Duration
+
+func (d *Duration) UnmarshalYAML(value *yaml.Node) error {
+	const methodCtx = "config.Duration.UnmarshalYAML"
+	if value == nil || strings.TrimSpace(value.Value) == "" {
+		return nil
+	}
+	parsed, err := time.ParseDuration(value.Value)
+	if err == nil {
+		*d = Duration(parsed)
+		return nil
+	}
+	n, convErr := strconv.ParseInt(value.Value, 10, 64)
+	if convErr != nil {
+		return fmt.Errorf("%s: %w", methodCtx, err)
+	}
+	*d = Duration(time.Duration(n))
+	return nil
+}
+
+func (d Duration) Std() time.Duration {
+	return time.Duration(d)
+}
 
 type Config struct {
 	HTTP struct {
 		Addr string `yaml:"addr"`
 	} `yaml:"http"`
 	MySQL struct {
-		DSN             string        `yaml:"dsn"`
-		MaxOpenConns    int           `yaml:"max_open_conns"`
-		MaxIdleConns    int           `yaml:"max_idle_conns"`
-		ConnMaxLifetime time.Duration `yaml:"conn_max_lifetime"`
+		DSN             string   `yaml:"dsn"`
+		MaxOpenConns    int      `yaml:"max_open_conns"`
+		MaxIdleConns    int      `yaml:"max_idle_conns"`
+		ConnMaxLifetime Duration `yaml:"conn_max_lifetime"`
 	} `yaml:"mysql"`
 	Redis struct {
 		Addr     string `yaml:"addr"`
@@ -24,8 +49,8 @@ type Config struct {
 		DB       int    `yaml:"db"`
 	} `yaml:"redis"`
 	JWT struct {
-		Secret string        `yaml:"secret"`
-		TTL    time.Duration `yaml:"ttl"`
+		Secret string   `yaml:"secret"`
+		TTL    Duration `yaml:"ttl"`
 	} `yaml:"jwt"`
 	Email struct {
 		Endpoint string `yaml:"endpoint"`
@@ -38,9 +63,9 @@ func Load(path string) (Config, error) {
 	c.HTTP.Addr = ":8080"
 	c.MySQL.MaxOpenConns = 20
 	c.MySQL.MaxIdleConns = 10
-	c.MySQL.ConnMaxLifetime = time.Hour
+	c.MySQL.ConnMaxLifetime = Duration(time.Hour)
 	c.JWT.Secret = "dev-secret"
-	c.JWT.TTL = 24 * time.Hour
+	c.JWT.TTL = Duration(24 * time.Hour)
 	c.Redis.Addr = "localhost:6379"
 	if path != "" {
 		b, err := os.ReadFile(path)

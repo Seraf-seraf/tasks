@@ -1,0 +1,16 @@
+http:
+  addr: ":8080"
+mysql:
+  dsn: "task:task@tcp(localhost:3306)/tasks?parseTime=true&multiStatements=true"
+  max_open_conns: 20
+  max_idle_conns: 10
+  conn_max_lifetime: 1h
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 0
+jwt:
+  secret: "change-me"
+  ttl: 24h
+email:
+  endpoint: ""

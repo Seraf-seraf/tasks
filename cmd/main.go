@@ -3,17 +3,17 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/Seraf-seraf/tasks/internal/app/bootstrap"
+	"github.com/Seraf-seraf/tasks/internal/config"
 	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
-	"taskservice/internal/bootstrap"
-	"taskservice/internal/config"
 	"time"
 )
 
 func main() {
-	configPath := flag.String("config", "config.yaml", "config path")
+	configPath := flag.String("config", "config/config.yaml", "config path")
 	flag.Parse()
 	log := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	cfg, err := config.Load(*configPath)

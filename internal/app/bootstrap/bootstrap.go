@@ -4,17 +4,18 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/go-redis/redis/v8"
-	_ "github.com/go-sql-driver/mysql"
 	"log/slog"
 	"net/http"
-	"taskservice/internal/app"
-	"taskservice/internal/config"
-	"taskservice/internal/email"
-	"taskservice/internal/httpapi"
-	"taskservice/internal/repository"
-	"taskservice/internal/service"
 	"time"
+
+	"github.com/Seraf-seraf/tasks/internal/app"
+	"github.com/Seraf-seraf/tasks/internal/config"
+	"github.com/Seraf-seraf/tasks/internal/email"
+	"github.com/Seraf-seraf/tasks/internal/httpapi"
+	repository "github.com/Seraf-seraf/tasks/internal/repository/mysql"
+	"github.com/Seraf-seraf/tasks/internal/service"
+	"github.com/go-redis/redis/v8"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func Build(ctx context.Context, c config.Config, log *slog.Logger) (func(context.Context) error, error) {
@@ -25,7 +26,7 @@ func Build(ctx context.Context, c config.Config, log *slog.Logger) (func(context
 	}
 	db.SetMaxOpenConns(c.MySQL.MaxOpenConns)
 	db.SetMaxIdleConns(c.MySQL.MaxIdleConns)
-	db.SetConnMaxLifetime(c.MySQL.ConnMaxLifetime)
+	db.SetConnMaxLifetime(c.MySQL.ConnMaxLifetime.Std())
 	if err := db.PingContext(ctx); err != nil {
 		return nil, fmt.Errorf("%s: %w", methodCtx, err)
 	}
