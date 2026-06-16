@@ -2,6 +2,7 @@ APP_NAME := taskservice
 BIN_DIR := bin
 BIN := $(BIN_DIR)/$(APP_NAME)
 MIGRATIONS_DIR := internal/migrations
+MYSQL_DSN ?= task:task@tcp(localhost:3306)/tasks?parseTime=true&multiStatements=true
 export GOCACHE ?= /tmp/go-build-cache
 export GOMODCACHE ?= /tmp/go-mod-cache
 
@@ -23,7 +24,7 @@ help:
 	@echo "  make db-up            - применить MySQL migrations через goose"
 	@echo "  make db-down          - откатить последнюю MySQL migration через goose"
 	@echo "  make db-status        - показать статус MySQL migrations через goose"
-	@echo "  make migrate DB_DSN=... - применить MySQL migrations"
+	@echo "  make migrate          - применить MySQL migrations"
 	@echo "  make compose-up       - поднять docker-compose stack"
 	@echo "  make compose-down     - остановить docker-compose stack"
 	@echo "  make compose-logs     - показать логи приложения"
@@ -67,18 +68,18 @@ clean:
 	rm -rf $(BIN_DIR) coverage.out coverage-critical.out
 
 db-up:
-	goose -dir $(MIGRATIONS_DIR) mysql "$(DB_DSN)" up
+	goose -dir $(MIGRATIONS_DIR) mysql "$(MYSQL_DSN)" up
 
 db-down:
-	goose -dir $(MIGRATIONS_DIR) mysql "$(DB_DSN)" down
+	goose -dir $(MIGRATIONS_DIR) mysql "$(MYSQL_DSN)" down
 
 db-status:
-	goose -dir $(MIGRATIONS_DIR) mysql "$(DB_DSN)" status
+	goose -dir $(MIGRATIONS_DIR) mysql "$(MYSQL_DSN)" status
 
 migrate: db-up
 
 compose-up:
-	docker compose -f docker/docker-compose.yml up --build
+	docker compose -f docker/docker-compose.yml up --build -d
 
 compose-down:
 	docker compose -f docker/docker-compose.yml down
