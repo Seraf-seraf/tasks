@@ -1,0 +1,11 @@
+openapi: 3.0.3
+info: {title: Task service API, version: 1.0.0}
+paths:
+  /api/v1/register: {post: {summary: Register user}}
+  /api/v1/login: {post: {summary: Login and receive JWT}}
+  /api/v1/teams: {post: {summary: Create team}, get: {summary: List my teams}}
+  /api/v1/teams/{id}/invite: {post: {summary: Invite user}}
+  /api/v1/tasks: {post: {summary: Create task}, get: {summary: List tasks with filters and pagination}}
+  /api/v1/tasks/{id}: {put: {summary: Update task}}
+  /api/v1/tasks/{id}/history: {get: {summary: Task history}}
+  /api/v1/reports: {get: {summary: Complex SQL reports}}
